@@ -1,0 +1,19 @@
+doctype html
+html(lang="en")
+    head
+        link(rel="stylesheet", type="text/css", href="/static/style.css")
+    body
+        div(class="fillpage blue")
+            div(class="center")
+                h1 Enter Game Lobby
+                p
+                    span(class="roomy") Name:
+                    input(type="text", id="name-input", maxlength="20")
+                p(class="subtle") Alpha-numeric characters only
+                p(class="subtle") Maximum 20 characters
+                p &nbsp;
+                form(method="get", action="/lobby")
+                    button Enter Game
+    script(src="/static/jquery-3.1.0.min.js")
+    script(src="/static/js.cookie.js")
+    script(src="/static/namechange.js")

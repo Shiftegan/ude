@@ -1,0 +1,30 @@
+doctype html
+
+- var roomID = room.id
+
+html(lang="en")
+    p(hidden="true", id="roomID")= roomID
+    head
+        title Dominion-O, dude!
+        link(rel="stylesheet", type="text/css", href="/static/style.css")
+    body
+        div(class="fixed-topleft")
+            //- p(class="subtle") Total viewers
+            button(onclick="forceDeal()") Redeal
+        div(class="fillpage blue")
+            div(class="other-players", id="other-players")
+            div(class="history", id="history")
+            div(class="purchase", id="purchase")
+            div(class="revealed", id="revealed")
+            div(class="mycards-wrapper")
+                div(class="mycards", id="my-cards")
+                div(class="mydeck", id="my-deck")
+                div(class="mydiscard", id="my-discard")
+                div(class="mychoices", id="my-choices")
+    script(src="/static/jquery-3.1.0.min.js")
+    script(src="/static/js.cookie.js")
+    script(src="/socket.io/socket.io.js")
+    script(src="/static/image-scale.js")
+    script(src="/static/utility.js")
+    script(src="/static/games/" + room.type + "/game.js")
+

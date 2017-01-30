@@ -1,0 +1,198 @@
+body {
+    padding: 0px;
+    margin: 0px 0px;
+}
+
+div.fillpage {
+    display: inline-block;
+    margin: 0px;
+    padding: 0px;
+    width: 100vw;
+    height: 100vh;
+}
+
+div.purchase {
+    margin: 0px auto;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80vw;
+    transform: translate(-50%, -50%);
+}
+
+.blue {
+    background-color: #15c7f6;
+}
+
+.green {
+    background-color: #15f698;
+}
+
+.red {
+    background-color: #e86042;
+}
+
+.grey {
+    background-color: lightgrey;
+}
+
+h1, h1, h2, h3, h4, h5, h6, p {
+    font-family: sans-serif;
+}
+
+h1 {
+    margin: 20px;
+}
+
+p {
+    margin: 4px;
+}
+
+p.subtle {
+    color: #1796b8;
+}
+
+
+
+#name-input {
+    margin: 0px 10px;
+    padding: 6px;
+}
+
+div.history {
+    position: relative;
+    float: left;
+    margin: 260px 0px;
+
+}
+div.history-card {
+    display: block;
+    position: relative;
+    margin: -130px 0px;
+    overflow: visible !important;
+}
+
+div.revealed {
+    position: relative;
+    float: right;
+    margin: 260px 0px;
+}
+div.revealed-card {
+    display: block;
+    position: relative;
+    margin: -130px 0px;
+    overflow: visible !important;
+}
+
+
+div.mycards-wrapper {
+    position: absolute;
+    bottom: 0px;
+    width: 100vw;
+    /*height: 100vh;*/
+    overflow: hidden;
+}
+
+div.mycards {
+    position: relative;
+    bottom: 0px;
+    margin: 0px 70px;
+    text-align: center;
+    float: left;
+}
+
+div.mydeck {
+    position: relative;
+    bottom: 0px;
+    margin: 0px auto;
+    text-align: center;
+    float: right;
+}
+
+div.mydeck img {
+    position: relative;
+    margin: 0px 30px;
+    bottom: -50px;
+    transition: bottom 0.1s ease-out;
+    /*transform: scale(0.8);*/
+}
+
+div.mydiscard {
+    position: relative;
+    bottom: -50px;
+    margin: 0px auto;
+    text-align: center;
+    float: right;
+}
+
+div.mydiscard img {
+    position: relative;
+    display: block;
+    margin: 0px 0px;
+    bottom: -50px;
+    /*transition: bottom 0.1s ease-out;
+    /*transform: scale(0.8);*/
+}
+
+div.mychoices {
+    position: relative;
+    bottom: 0px;
+    margin: 0px auto;
+    text-align: center;
+    float: right;
+}
+
+div.card {
+    display: inline-block;
+    position: relative;
+    overflow: visible !important;
+}
+
+div.card img {
+    position: relative;
+    display: block;
+}
+
+div.hand-card {
+    display: inline-block;
+    position: relative;
+    margin: 0px -30px;
+    bottom: -50px;
+    overflow: visible !important;
+}
+
+div.hand-card img {
+    position: relative;
+    display: block;
+}
+
+div.other-players {
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    width: 80%;
+    min-width: 300px;
+    transform: translateX(-50%);
+}
+
+div.player-info {
+    display: inline-block;
+    margin: 0px 30px;
+}
+
+span.massive {
+    font-size: 25em;
+    color: #1796b8;
+    margin: 40px;
+}
+
+.fixed-topleft {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+}
+
+.blur {
+    filter: sepia(1);
+}

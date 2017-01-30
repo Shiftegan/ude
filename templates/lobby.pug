@@ -1,0 +1,18 @@
+doctype html
+html(lang="en")
+    head
+        link(rel="stylesheet", type="text/css", href="/static/style.css")
+    body
+        div(class="fillpage blue")
+            div(class="center")
+                h1 Rooms
+                div(class="rooms", id="rooms")
+            input(type="text", id="gamename-input", maxlength="20")
+            select(id="gametype-input")
+                each game in games
+                    option= game
+            button(onClick="createRoom()") Create
+    script(src="/static/jquery-3.1.0.min.js")
+    script(src="/static/js.cookie.js")
+    script(src="/socket.io/socket.io.js")
+    script(src="/static/lobby.js")
