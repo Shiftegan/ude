@@ -140,7 +140,13 @@ class Game {
 	getPlayer(object) {
 		if(typeof(object) == "string") return this.players.get(object)
 		if(object instanceof Player) return object
-		else return this.players.get(object.id)
+		else {
+			var player = this.players.get(object.id)
+			if(!player) {
+				this.addPlayer(object)
+				return this.players.get(object.id)
+			} else return player
+		}
 	}
 
 	process(user, data) {
