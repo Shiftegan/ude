@@ -194,6 +194,9 @@ class Game {
 
 		this.populatePurchase()
 
+		this.trash.empty()
+		this.history = []
+
 		for(var p of this.players.values()){
 			p.reset()
 			if(p.user.connected){

@@ -238,7 +238,7 @@ addAttack({name: "Bureaucrat", cost:4, image: "/base/bureaucrat.jpg",
 						function(current_player, choice){
 							if(choice != "Reveal Hand"){
 								game.revealCard(current_player, choice.name)
-								current_player.trashCard(choice)
+								current_player.hand.remove(choice)
 								current_player.deck.unshift(choice)
 							} else {
 								for(var card of current_player.hand.cards){
