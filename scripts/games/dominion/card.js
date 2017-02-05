@@ -205,6 +205,7 @@ addAction({name: "Workshop", cost:3, image: "/base/workshop.jpg",
 		console.log("Playing workshop effect")
 		game.playerChoice(player, game.getCards(player, {locations: ["purchase"], maxCost:4}),[],
 			function(player, choice){
+                game.addHistory(choice.name, "Gained", player.name)
 				player.gainCard(game.buyCard(choice.name))
 				if(callback){callback()}
 			})
@@ -342,7 +343,7 @@ addAction({name: "Throne Room", cost:4, image: "/base/throneroom.jpg",
 		game.playerChoice(player, game.getCards(player, {locations: ["hand"], type: "action", playable: true, invalid: "Throne Room"}), [],
 			function(player, choice){
 				player.discardCard(choice)
-				game.history.push(choice)
+				this.game.addHistory(choice.name, "Doubled", player.name)
 				choice.play(player, game, function(){
 					game.history.push(choice)
 					choice.play(player, game, function(){

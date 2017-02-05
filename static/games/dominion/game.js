@@ -67,6 +67,33 @@ deck.resize = function(w, h){
     this.move(discard.right, "left")
 }
 
+var trash = new CardPile(0,0, 108, 173, "right", {
+    spread: {
+        x: 0,
+        y: 20,
+        centered: false,
+        fromRight: true
+    }
+}, copy(SteadyHand))
+trash.resize = function(w, h){
+    // this.transform.position.x = w - 108*2
+    // this.transform.position.y = 180
+    trash.move({x: w, y: 180}, "right")
+}
+
+var historyPile = new CardPile(0,0, 108, 173, "center", {
+    spread: {
+        x: 0,
+        y: 20,
+        centered: false,
+        fromRight: true
+    }
+}, copy(SteadyHand))
+historyPile.resize = function(w, h){
+    this.transform.position.x = w - 108*1.5 - 10
+    this.transform.position.y = 180
+}
+
 var firstRow = new CardPile(0, 0, 108, 173, "center", {
     spread: {
         x: 108
@@ -189,11 +216,12 @@ cardTable.addCardPile(playerLabels)
 cardTable.addCardPile(playerChoices)
 cardTable.addCardPile(hand);
 cardTable.addCardPile(deck);
-// cardTable.addCardPile(revealed)
 cardTable.addCardPile(discard);
 cardTable.addCardPile(firstRow);
 cardTable.addCardPile(secondRow);
 cardTable.addCardPile(playerList);
+cardTable.addCardPile(trash)
+cardTable.addCardPile(historyPile)
 
 // Begin main loop
 cardTable.beginLoop();
@@ -378,6 +406,23 @@ function populatePage(data) {
             }
         }
 
+        for(var c of data.game.trash){
+            if(cardInfo[c.id]){
+                cardInfo[c.id].object.img.src = getImage(c)
+                trash.stealCard(cardInfo[c.id].object)
+                cardInfo[c.id].alive = true
+                cardInfo[c.id].location = trash
+                card = cardInfo[c.id].object
+            } else {
+                var card = new BorderedPictureCard(getImage(c))
+                cardInfo[c.id] = {object: card, alive: true, location: trash}
+                trash.addCard(card)
+            }
+            card.border_active = false
+            card.grayed_out = false
+
+        }
+
 
 
 
@@ -408,40 +453,17 @@ function populatePage(data) {
         firstRow.skipAnimations()
         secondRow.skipAnimations()
 
+        historyPile.empty()
+        for(var h of data.game.history){
+            var card = new BorderedPictureCard(getImage(h.card), h.player + " " + h.action)
+            historyPile.addCard(card)
+        }
+        historyPile.skipAnimations()
+
 
         for(var id of Object.keys(cardInfo)){
             if(!cardInfo[id].alive) cardInfo[id].location.removeCard(cardInfo[id].object)
         }
-
-        // $('#my-choices').empty();
-        // console.log(data.active_info)
-        // if(data.active_info.otherChoices){
-        //     for(var c of data.active_info.otherChoices){
-        //         let name = c
-        //         var button = ce('button').text(c)
-        //         button.on('click', function() {
-        //             console.log("sending choice ", name, "other")
-        //             sayMessage('makeChoice', {choice: name, choiceType: "other"})
-        //         })
-        //         $('#my-choices').append(button)
-        //     }
-
-        // }
-        // cardHistory.empty()
-        // for(var c of data.history){
-        //     c = new PictureCard(108, 173, getImage(data, c))
-        //     cardHistory.addCard(c)
-        // }
-        // cardHistory.skipAnimations()
-
-        // revealed.empty()
-        // for(var c of data.revealed){
-        //     c = new PictureCard(108, 173, getImage(data, c))
-        //     revealed.addCard(c)
-        // }
-        // revealed.skipAnimations()
-
-
     }
 }
 

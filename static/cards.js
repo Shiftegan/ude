@@ -76,12 +76,15 @@ class Ctx {
     }
 
     drawImage(img, x, y, w, h) {
-        //console.log(img, img.src);
         this.raw_ctx.drawImage(img, x, y, w, h);
     }
 
+    textWidth(text) {
+        return this.raw_ctx.measureText(text).width;
+    }
+
     centerText(text, x, y) {
-        var width = this.raw_ctx.measureText(text).width;
+        var width = this.textWidth(text);
         this.text(text, x - width / 2, y);
     }
 
@@ -298,7 +301,7 @@ class Card {
                 y = -this.size.height / 2;
                 break;
             case "right":
-                x = this.size.width;
+                x = -this.size.width;
                 y = -this.size.height / 2;
                 break;
         }
@@ -408,9 +411,11 @@ class BorderedPictureCard extends PictureCard {
             ctx.fill('black');
             ctx.rect(x - 5, y - 5, w + 10, h + 10);
 
-            ctx.rect(x + w / 2 - 20, y - 30, 40, 31);
-            ctx.fill('white');
             ctx.font('Arial', 13);
+            var tw = Math.max(ctx.textWidth(this.num) + 15, 30);
+            ctx.rect(x + w / 2 - tw/2, y - 30, tw, 31);
+
+            ctx.fill('white');
             ctx.centerText(this.num, x + w / 2, y - 12);
         }
         super.drawCard(ctx, x, y, w, h);
@@ -784,7 +789,6 @@ class CardPile {
     }
 
     drawOutline(ctx, x, y, w, h) {
-        //console.log('test');
         ctx.stroke('grey');
         ctx.strokeRect(x, y, w, h);
     }
@@ -902,7 +906,7 @@ class CardPile {
     }
 
     updateTransforms() {
-        var opt = this.hovered && this.options.hover.enabled ? this.options.hover : this.options;
+        var opt = (this.hovered && this.options.hover.enabled) ? this.options.hover : this.options;
 
         for (var i = 0; i < this.cards.length; i++) {
             var card = this.cards[i];

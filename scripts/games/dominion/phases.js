@@ -33,6 +33,7 @@ class BuyPhase extends Phase {
 			this.game.advancePhase(this)
 			this.game.stamp++
 		} else if(this.options.cards.includes(choice)){
+			this.game.addHistory(choice.name, "Bought", player.name)
 			player.gainCard(this.game.buyCard(choice.name))
 			this.buys -= 1
 			this.gold -= choice.cost
@@ -73,7 +74,7 @@ class ActionPhase extends Phase {
 	}
 
 	check(){
-		if((this.actions == 0 || !this.game.activePlayer.hasAction(this.game)) && this.game.phase == this) this.game.advancePhase(this)
+		if((this.actions == 0 || !this.game.activePlayer.hasAction()) && this.game.phase == this) this.game.advancePhase(this)
 	}
 
 	decision(player, choice){
@@ -81,6 +82,7 @@ class ActionPhase extends Phase {
 			this.game.advancePhase(this)
 			this.game.stamp++
 		} else if(this.options.cards.includes(choice)){
+			this.game.addHistory(choice.name, "Played", player.name)
 			choice.play(player, this.game)
 			player.discardCard(choice)
 			this.actions -= 1

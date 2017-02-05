@@ -1,6 +1,8 @@
 var shuffle = require('shuffle-array')
 
-var Player = require('./player')
+var playerImp = require('./player')
+var Player = playerImp.Player
+var Zone = playerImp.Zone
 var phase = require('./phases')
 var cards = require('./card')
 var utility = require('../../utility')
@@ -66,6 +68,8 @@ class Game {
 
 		this._lastCardID = 0
 		this.stamp = 0
+
+		this.trash = new Zone([], "Trash")
 	}
 
 	set activePlayer(val){
@@ -90,7 +94,9 @@ class Game {
 		})
 		return {
 			purchase: purchase,
-			stamp: this.stamp
+			trash: this.trash.data,
+			stamp: this.stamp,
+			history: this.history
 		}
 	}
 
@@ -118,7 +124,7 @@ class Game {
 
 	addPlayer(user) {
 		if(!this.players[user.id]){
-			this.players.set(user.id, new Player(user))
+			this.players.set(user.id, new Player(user, this))
 			this.stamp++
 		}
 	}
@@ -183,7 +189,7 @@ class Game {
 		this.populatePurchase()
 
 		for(var p of this.players.values()){
-			p.reset(this)
+			p.reset()
 			if(p.user.connected){
 				p.redraw()
 				playerOrder.push(p)
@@ -293,7 +299,7 @@ class Game {
 				break
 			case "Buy":
 				this.advancePlayer()
-				if(this.activePlayer.hasAction(this)) this.phase = new phase.ActionPhase(this)
+				if(this.activePlayer.hasAction()) this.phase = new phase.ActionPhase(this)
 				else this.phase = new phase.BuyPhase(this, 0, 1, 0)
 				break
 			case "Action":
@@ -314,6 +320,12 @@ class Game {
 				player.revealed.empty()
 			}
 		}
+	}
+
+	addHistory(name, action, playerName){
+		var card = new Card(this.lastCardID, cards[name])
+		this.history.push({card: card.data, action: action, player: playerName})
+		if(this.history.length > 8) this.history.shift()
 	}
 
 	buyCard(name) {

@@ -60,7 +60,8 @@ class Zone{
 }
 
 class Player{
-	constructor(user) {
+	constructor(user, game) {
+		this.game = game
 		this.user = user
 
 		this.in_game = false
@@ -73,13 +74,13 @@ class Player{
 		}
 	}
 
-	reset(game){
+	reset(){
 		this.hand.empty()
 		this.deck.empty()
 		this.discard.empty()
 		this.revealed.empty()
-        for(var i = 0; i < 7; i++) this.deck.push(game.buyCard("Copper"))
-        for(var i = 0; i < 3; i++) this.deck.push(game.buyCard("Estate"))
+        for(var i = 0; i < 7; i++) this.deck.push(this.game.buyCard("Copper"))
+        for(var i = 0; i < 3; i++) this.deck.push(this.game.buyCard("Estate"))
 		this.deck.shuffle()
 		this.order = {next: undefined, prev: undefined}
 	}
@@ -176,6 +177,7 @@ class Player{
 	}
 
 	trashCard(c){
+		this.game.trash.push(c)
 		this.hand.remove(c)
 	}
 
@@ -194,9 +196,9 @@ class Player{
 		this.discard.push(card)
 	}
 
-	hasAction(game){
+	hasAction(){
 		for(var c of this.hand.cards){
-			if(c.playable(this, game)){
+			if(c.playable(this, this.game)){
 				return true
 			}
 		}
@@ -217,4 +219,5 @@ class Player{
 	}
 }
 
-module.exports = Player
+module.exports = {Player: Player,
+	Zone: Zone}
