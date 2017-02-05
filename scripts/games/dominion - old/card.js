@@ -20,7 +20,7 @@ function addCard(values){
 		getValue: function(player, game){return this.value},
 
 		points: 0,
-		getPoints: function(player){return this.points},
+		getPoints: function(player, game){return this.points},
 
 		buys: 0,
 		getBuys: function(player, game){return this.buys},
@@ -57,10 +57,10 @@ function addAction(values){
 	addCard(utility.mergeDic({
 		types: ["action"],
 		play: function(player, game, callback){
-                game.phase.actions += this.getActions(player, game)
-                game.phase.buys += this.getBuys(player, game)
-                game.phase.gold += this.getGold(player, game)
-                player.draw(this.getCards(player, game))
+				player.addActions(this.getActions(player,game))
+				player.addCards(this.getCards(player,game))
+				player.addGold(this.getGold(player,game))
+				player.addBuys(this.getBuys(player,game))
 
 				if(this.effect){
 					console.log("Playing effect")
@@ -68,7 +68,7 @@ function addAction(values){
 				} else {
 					if(callback){callback()}
 				}
-			},
+			}, 
 		playable: function(player, game){return true}},
 		values))
 }
@@ -77,24 +77,23 @@ function addAttack(values){
 	addAction(utility.mergeDic({
 		types: ["action", "attack"],
 		play: function(player, game, callback){
-                game.phase.actions += this.getActions(player, game)
-                game.phase.buys += this.getBuys(player, game)
-                game.phase.gold += this.getGold(player, game)
-                player.draw(this.getCards(player, game))
-
+				player.addActions(this.getActions(player,game))
+				player.addCards(this.getCards(player,game))
+				player.addGold(this.getGold(player,game))
+				player.addBuys(this.getBuys(player,game))
 				var multi = new utility.Multifunc()
 				var unaffected = [player]
-				game.emptyReveal()
+				game.revealed = []
 
 				for(var p of game.players.values()){
-					if(p != player && p.in_game){
+					if(p != player){
 						let current_player = p
 						multi.push(function(callback){
 							game.playerChoice(current_player, game.getCards(current_player, {locations: ["hand"], type: "reaction"}), ["Reveal None"],
 								function(current_player, choice){
 									if(choice != "Reveal None"){
 										choice.react(current_player, game)
-										game.revealCard(current_player, choice.name)
+										game.revealed.push(choice.name)
 										if(choice.name == "Moat"){
 											unaffected.push(current_player)
 										}
@@ -114,7 +113,7 @@ function addAttack(values){
 							if(callback){callback()}
 						}
 				})
-
+				
 		}
 
 	}, values))
@@ -135,19 +134,20 @@ addVictory({name: "Duchy", 		points:3, cost:5, image: "/common/duchy.jpg"})
 addVictory({name: "Province", 	points:6, cost:8, image: "/common/province.jpg"})
 addVictory({name: "Curse", 		points:-1, cost:0, image: "/common/curse.jpg"})
 
-addVictory({name: "Gardens", getPoints: function(player){return Math.floor(player.deck.length/10)}, cost:4, image: "/base/gardens.jpg"})
+addVictory({name: "Gardens", getPoints: function(player, game){return Math.floor(player.deck.length/10)}, cost:4, image: "/base/gardens.jpg"})
 
 addAction({name: "Cellar", cost:2, actions:1, image: "/base/cellar.jpg",
 	effect: function(player, game, callback){
 		var discarded = 0
 		var func = function(func, player){
-			game.playerChoice(player, game.getCards(player, {locations: ["hand"]}), ["Done"],
+			game.playerChoice(player, game.getCards(player, {locations: ["hand"]}), ["Done"], 
 				function(player, choice){
 					if(choice == "Done"){
 						player.draw(discarded)
 						if(callback){callback()}
 					} else {
-						player.discardCard(choice)
+						player.discardCard(choice.name)
+						player.discard.push(choice.name)
 						discarded += 1
 						func(func, player)
 					}
@@ -174,11 +174,11 @@ addAction({name: "Chapel", cost:2, image: "/base/chapel.jpg",
 	effect: function(player, game, callback){
 		var trashed = 0
 		var func = function(func, player){
-			game.playerChoice(player, game.getCards(player, {locations: ["hand"]}), ["Done"],
+			game.playerChoice(player, game.getCards(player, {locations: ["hand"]}), ["Done"], 
 				function(player, choice){
 					if(choice != "Done"){
 						trashed += 1
-						player.trashCard(choice)
+						player.discardCard(choice.name)
 						if(trashed == 4){
 							if(callback){callback()}
 						} else {
@@ -205,7 +205,8 @@ addAction({name: "Workshop", cost:3, image: "/base/workshop.jpg",
 		console.log("Playing workshop effect")
 		game.playerChoice(player, game.getCards(player, {locations: ["purchase"], maxCost:4}),[],
 			function(player, choice){
-				player.gainCard(game.buyCard(choice.name))
+				player.gainCard(choice.name)
+				game.purchase[choice.name] -= 1
 				if(callback){callback()}
 			})
 
@@ -218,9 +219,10 @@ addAction({name: "Woodcutter", cost:3, buys:1, gold:2, image: "/base/woodcutter.
 
 addAttack({name: "Bureaucrat", cost:4, image: "/base/bureaucrat.jpg",
 	effect: function(player, game , unaffected, callback){
-		player.deck.unshift(game.buyCard("Silver"))
+		player.deck.unshift("Silver")
+		game.purchase["Silver"] -= 1
 		var multi = new utility.Multifunc()
-
+		
 
 		for(var p of game.players.values()){
 			if(p != player && !unaffected.includes(p)){
@@ -234,14 +236,14 @@ addAttack({name: "Bureaucrat", cost:4, image: "/base/bureaucrat.jpg",
 					}
 
 					game.playerChoice(current_player, cards, other,
-						function(current_player, choice){
+						function(player, choice){
 							if(choice != "Reveal Hand"){
-								game.revealCard(current_player, choice.name)
-								current_player.trashCard(choice)
-								current_player.deck.unshift(choice)
+								game.revealed.push(choice.name)
+								current_player.discardCard(choice.name)
+								current_player.deck.unshift(choice.name)
 							} else {
-								for(var card of current_player.hand.cards){
-									game.revealCard(current_player, card.name)
+								for(var card of current_player.hand){
+									game.revealed.push(card)
 								}
 							}
 							cb()
@@ -260,27 +262,29 @@ addAction({name: "Feast", cost:4, image: "/base/feast.jpg",
 		console.log("Destroyed: ", player.discard.pop())
 		game.playerChoice(player, game.getCards(player, {locations: ["purchase"], maxCost:5}),[],
 			function(player, choice){
-				player.gainCard(game.buyCard(choice.name))
+				player.gainCard(choice.name)
+				game.purchase[choice.name] -= 1
 				if(callback){callback()}
-
+				
 		})
 	}})
 
-addAttack({name: "Militia", cost:4, gold:2, image: "/base/militia.jpg",
+addAttack({name: "Militia", cost:4, gold:2, image: "/base/militia.jpg", 
 	effect: function(player, game, unaffected, callback){
 		var multi = new utility.Multifunc()
 
 		for(var p of game.players.values()){
 			if(p != player && !unaffected.includes(p)){
-
+				
 				let current_player = p
 				if(current_player.hand.length > 3){
 					multi.push(function(cb){
 
 						var func = function(func, current_player){
-							game.playerChoice(current_player, game.getCards(current_player, {locations: ["hand"]}), ["Done"],
+							game.playerChoice(current_player, game.getCards(current_player, {locations: ["hand"]}), ["Done"], 
 								function(current_player, choice){
-									current_player.discardCard(choice)
+									current_player.discardCard(choice.name)
+									current_player.discard.push(choice.name)
 									if(current_player.hand.length > 3){
 										func(func, current_player)
 									} else {
@@ -296,7 +300,7 @@ addAttack({name: "Militia", cost:4, gold:2, image: "/base/militia.jpg",
 			}
 		}
 		multi.run(function(){if(callback){callback()}})
-	}
+	}	
 })
 
 addAction({name: "Moneylender", cost:4, image: "/base/moneylender.jpg",
@@ -306,7 +310,7 @@ addAction({name: "Moneylender", cost:4, image: "/base/moneylender.jpg",
 	effect: function(player, game, callback){
 		game.playerChoice(player, ["Copper"], [],
 			function(player, choice){
-				player.trashCard(choice)
+				player.discardCard(choice)
 				player.addGold(3)
 				if(callback){callback()}
 			})
@@ -315,12 +319,12 @@ addAction({name: "Moneylender", cost:4, image: "/base/moneylender.jpg",
 addAttack({name: "Spy", cost:4, image: "/base/spy.jpg",
 	effect: function(player, game, unaffected, callback){
 		var multi = new utility.Multifunc()
-		game.emptyReveal()
+		game.revealed = []
 		for(var p of game.players.values()){
 			if(!unaffected.includes(p) || p == player){
 				let current_player = p
 				multi.push(function(cb){
-					game.revealCard(current_player, current_player.deck.cards[current_player.deck.length-1].name)
+					game.revealed.push(current_player.deck[current_player.deck.length-1])
 					game.playerChoice(player, [], ["Keep (" + current_player.user.name + ")", "Discard (" + current_player.user.name + ")"], function(player, choice){
 						if(choice.startsWith("Discard")){
 							current_player.mill(1)
@@ -342,9 +346,9 @@ addAction({name: "Throne Room", cost:4, image: "/base/throneroom.jpg",
 		game.playerChoice(player, game.getCards(player, {locations: ["hand"], type: "action", playable: true, invalid: "Throne Room"}), [],
 			function(player, choice){
 				player.discardCard(choice)
-				game.history.push(choice)
+				game.history.push(choice.name)
 				choice.play(player, game, function(){
-					game.history.push(choice)
+					game.history.push(choice.name)
 					choice.play(player, game, function(){
 						if(callback){callback()}
 					})
@@ -358,12 +362,13 @@ addAction({name: "Remodel", cost:4, image: "/base/remodel.jpg",
 		return player.hand.length > 1
 	},
 	effect: function(player, game, callback){
-		game.playerChoice(player, game.getCards(player, {locations: ["hand"]}), [],
+		game.playerChoice(player, game.getCards(player, {locations: ["hand"]}), [], 
 			function(player, choice){
-				player.trashCard(choice)
+				player.discardCard(choice)
 				game.playerChoice(player, game.getCards(player, {locations: ["purchase"], maxCost: 2 + choice.cost}), [],
 					function(player, choice){
-						player.gainCard(game.buyCard(choice.name))
+						player.gainCard(choice)
+						game.purchase[choice.name] -= 1
 						if(callback){callback()}
 					})
 			})
@@ -389,13 +394,13 @@ addAction({name: "Mine", cost:5, image: "/base/mine.jpg",
 		return game.getCards(player, {locations: ["hand"], type: "treasure"}).length > 1
 	},
 	effect: function(player, game, callback){
-		game.playerChoice(player, game.getCards(player, {locations: ["hand"], type: "treasure"}), [],
+		game.playerChoice(player, game.getCards(player, {locations: ["hand"], type: "treasure"}), [], 
 			function(player, choice){
-				player.trashCard(choice)
+				player.discardCard(choice)
 				game.playerChoice(player, game.getCards(player, {locations: ["purchase"], type: "treasure", maxCost: 3 + choice.cost}), [],
 					function(player, choice){
-						player.gainCard(game.buyCard(choice.name))
-
+						player.gainCard(choice)
+						game.purchase[choice.name] -= 1
 						if(callback){callback()}
 					})
 			})
@@ -406,9 +411,11 @@ addAction({name: "Festival", cost:5, actions:2, buys:1, gold:2, image: "/base/fe
 
 addAttack({name: "Witch", cost:5, cards:2, image: "/base/witch.jpg",
 	effect: function(player,game,unaffected, callback){
+		console.log("Playing witch effect: YAY")
 		for(var p of game.players.values()){
 			if(!unaffected.includes(p)){
-				p.gainCard(game.buyCard("Curse"))
+				p.gainCard("Curse")
+				game.purchase["Curse"] -= 1
 			}
 		}
 		if(callback){callback()}
@@ -418,14 +425,16 @@ addAttack({name: "Witch", cost:5, cards:2, image: "/base/witch.jpg",
 
 addAction({name: "Adventurer", cost:6, image: "/base/adventurer.jpg",
 	effect: function(player,game,callback){
-		game.emptyReveal(player)
+		console.log("Playing adventurer effect")
+		game.revealed = []
 		var revealedTreasures = []
 		while(revealedTreasures.length < 2 && player.discard.length + player.deck.length > 0){
-			var revealed = player.peel(1)[0]
-			if(revealed.types.includes("treasure")){
+			var revealed = player.mill(1)[0]
+			console.log(revealed)
+			if(cards[revealed].types.includes("treasure")){
 				revealedTreasures.push(revealed)
 			}
-			game.revealCard(player, revealed.name)
+			game.revealed.push(revealed)
 		}
 		for(var c of revealedTreasures){
 			player.hand.push(c)
@@ -435,4 +444,6 @@ addAction({name: "Adventurer", cost:6, image: "/base/adventurer.jpg",
 
 addReaction({name: "Moat", cost:2 ,cards:2, image: "/base/moat.jpg"})
 
-module.exports = cards
+module.exports = {
+	cards: cards
+}

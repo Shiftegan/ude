@@ -6,7 +6,7 @@ var io = require('socket.io')(server);
 var Host = require('./scripts/server.js')
 // var uuid = require('uuid');
 
-var games = ["dominion"]
+var games = ["dominion", "boomo"]
 
 app.use('/static', express.static(__dirname + '/static/'));
 
@@ -42,7 +42,7 @@ io.on('connection', function(socket) {
     socket.on('askUpdate', function(data){
         host.keepAwake(userID)
         var response = host.getUpdate(userID, data)
-        if(response){
+        if(response && response[1]){
             socket.emit(response[0], response[1])
         }
     })

@@ -1,5 +1,6 @@
 var io = require("../index.js")
 var Dominion = require("./games/dominion/game.js")
+var Boomo = require("./games/boomo/game.js")
 
 function User(id, name) {
 	this.id = id
@@ -10,7 +11,7 @@ function User(id, name) {
 
 function Host() {
 
-	this.games = {"dominion": Dominion}
+	this.games = {"dominion": Dominion, "boomo": Boomo}
 
     this.users = new Map()
     this.rooms = new Map()
@@ -83,8 +84,11 @@ function Host() {
     	console.log("RECIEVED MESSAGE:", data)
     	var user = this.getUser(id)
     	if(data.roomID != undefined){
-    		var room = this.rooms.get(data.roomID)
-    		return room.process(user, data)}
+    		if(this.rooms.has(data.roomID)){
+                var room = this.rooms.get(data.roomID)
+    		    return room.process(user, data)
+            }
+        }
     	else{return this.process(user, data)}
     }
 
@@ -117,7 +121,9 @@ function Host() {
 			}
 			return ["sayUpdate", {roomData: roomData}]
 		} else {
-			return ["sayUpdate", this.rooms.get(data.roomID).getUpdate(user, data)]
+            if(this.rooms.has(data.roomID)){
+                return ["sayUpdate", this.rooms.get(data.roomID).getUpdate(user, data)]
+            }
 		}
 	}
 }
