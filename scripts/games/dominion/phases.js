@@ -83,8 +83,9 @@ class ActionPhase extends Phase {
 			this.game.stamp++
 		} else if(this.options.cards.includes(choice)){
 			this.game.addHistory(choice.name, "Played", player.name)
-			choice.play(player, this.game)
 			player.discardCard(choice)
+			choice.play(player, this.game)
+
 			this.actions -= 1
 			this.game.stamp++
 			this.check()

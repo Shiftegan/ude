@@ -70,7 +70,8 @@ class Player{
 					hand: new Zone([], "Hand"),
 					deck: new Zone([], "Deck", true),
 					discard: new Zone([], "Discard"),
-					revealed: new Zone([], "Reveal")
+					revealed: new Zone([], "Reveal"),
+					temp : new Zone([], "Temporary")
 		}
 	}
 
@@ -79,7 +80,8 @@ class Player{
 		this.deck.empty()
 		this.discard.empty()
 		this.revealed.empty()
-        for(var i = 0; i < 7; i++) this.deck.push(this.game.buyCard("Copper"))
+		this.temp.empty()
+        for(var i = 0; i < 7; i++) this.deck.push(this.game.buyCard("Gold"))
         for(var i = 0; i < 3; i++) this.deck.push(this.game.buyCard("Estate"))
 		this.deck.shuffle()
 		this.order = {next: undefined, prev: undefined}
@@ -105,7 +107,10 @@ class Player{
 	set discard(val) {this.zones.discard = val}
 
 	get revealed() {return this.zones.revealed}
-	set revealed(val) {this.zones.reveald = val}
+	set revealed(val) {this.zones.revealed = val}
+
+	get temp() {return this.zones.temp}
+	set temp(val) {this.zone.revealed = val}
 
 	get cards() {return this.hand.length}
 	set cards(val) {this.draw(val - this.hand.length)}
@@ -127,6 +132,7 @@ class Player{
 			revealed: this.revealed.data,
 			deck: this.deck.data,
 			discard: this.discard.data,
+			temp: this.temp.data,
 			hand: this.hand.data,
 			name: this.user.name,
 			active: this.active

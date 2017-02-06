@@ -47,7 +47,7 @@ function f(func){
 
 
 BASE_SET = ["Copper", "Silver", "Gold", "Estate", "Duchy", "Province", "Curse"]
-ACTION_SET = ["Moat", "Cellar", "Workshop", "Woodcutter", "Bureaucrat", "Remodel", "Throne Room", "Witch", "Festival", "Market"]
+ACTION_SET = ["Moat", "Cellar", "Workshop", "Woodcutter", "Bureaucrat", "Remodel", "Throne Room", "Witch", "Festival", "Sentry"]
 
 class Game {
 	constructor(id, name) {
@@ -234,7 +234,7 @@ class Game {
 	        } else if (cards[c].types[0] == "victory"){
 	            if(c == "Curse"){
 	                this.purchase[c] = {
-	                    amount: 10 * (this.players.length - 1),
+	                    amount: 10 * (this.players.size - 1),
 	                    card: new Card(this.lastCardID, cards[c])
 	                }
 	            } else {

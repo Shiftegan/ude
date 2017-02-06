@@ -321,11 +321,17 @@ addAttack({name: "Spy", cost:4, image: "/base/spy.jpg",
 			if(!unaffected.includes(p) || p == player){
 				let current_player = p
 				multi.push(function(cb){
-					game.revealCard(current_player, current_player.deck.cards[current_player.deck.length-1].name)
-					game.playerChoice(player, [], ["Keep (" + current_player.user.name + ")", "Discard (" + current_player.user.name + ")"], function(player, choice){
-						if(choice.startsWith("Discard")){
-							current_player.mill(1)
-						}
+                    var card = current_player.deck.cards[current_player.deck.length-1]
+					game.revealCard(current_player, card.name)
+                    player.temp.push(card)
+                    current_player.deck.remove(card)
+					game.playerChoice(player, [], ["Keep", "Discard"], function(player, choice){
+						if(choice == "Discard"){
+							current_player.discard.push(card)
+						} else {
+                            current_player.deck.unshift(card)
+                        }
+                        player.temp.remove(card)
 						cb()
 					})
 				})
@@ -370,6 +376,69 @@ addAction({name: "Remodel", cost:4, image: "/base/remodel.jpg",
 			})
 	}
 })
+
+addAction({name: "Sentry", cost: 5, actions: 1, cards: 1, image: "/base/sentry.jpg",
+    effect: function(player, game, callback){
+        var first = player.peel(1)[0]
+        var second = player.peel(1)[0]
+        player.temp.push(first)
+        game.playerChoice(player, [], ["Leave", "Discard", "Trash"], function(player, choice){
+            player.temp.remove(first)
+            var choices = ["Leave", "Discard", "Trash"]
+            if(choice == "Leave"){
+                var choices = ["Leave", "Under", "Discard", "Trash"]
+                player.deck.unshift(first)
+            } else if (choice == "Discard"){
+                player.discard.push(first)
+            } else {
+                game.trash.push(first)
+            }
+            player.temp.push(second)
+
+            game.playerChoice(player, [], choices, function(player, choice){
+                player.temp.remove(second)
+                if(choice == "Leave"){
+                    player.deck.unshift(second)
+                } else if (choice == "Discard"){
+                    player.discard.push(second)
+                } else if (choice == "Under"){
+                    var top = player.peel(1)[0]
+                    player.deck.unshift(second)
+                    player.deck.unshift(top)
+                } else {
+                    game.trash.push(second)
+                }
+                if(callback)callback()
+        })
+    })
+}})
+
+addAction({name: "Library", cost: 5, image: "/base/library.jpg",
+    effect: function(player, game, callback){
+        var library = function(){
+            var card = player.peel(1)[0]
+            if(card.types.includes("action")){
+                player.temp.push(card)
+                game.playerChoice(player, [], ["Keep", "Pass"], function(player, choice){
+                    if(choice == "Keep"){
+                        player.hand.push(card)
+                        player.temp.remove(card)
+                    } else {
+                        player.discard.push(card)
+                        player.temp.remove(card)
+                    }
+                    if(player.hand.length < 7) library()
+                    else if(callback) callback()
+                })
+            } else {
+                player.hand.push(card)
+                if(player.hand.length < 7) library()
+                else if(callback) callback()
+            }
+        }
+
+        library()
+    }})
 
 addAction({name: "Laboratory", cost:5, cards:2, actions:1, image: "/base/laboratory.jpg"})
 

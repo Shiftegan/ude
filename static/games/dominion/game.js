@@ -46,6 +46,8 @@ hand.resize = function(w, h){
     this.transform.position.y = h
 }
 
+
+
 var discard = new CardPile(0, 0, 108*1.2, 173*1.2, "bottom", {
     hover: {
         spread: {
@@ -212,8 +214,13 @@ var playerChoices = new CardPile(0,0, 100, 30, "bottom", {
 playerChoices.resize = function(w,h) {
     this.move(discard.left, "right")
     this.transform.position.y -= discard.height/2 - this.height/2
-    // this.transform.position.x -= discard.width/2
-    // this.transform.position.y -= discard.height/2
+}
+
+
+var temp = new CardPile(0, 0, 108*1.2, 173*1.2, "center", {spread: {x: -80, centered: false, fromRight:true}}, copy(SteadyHand))
+temp.resize = function(w, h){
+    this.move(playerChoices.left, "right")
+    this.transform.position.y += this.height/2 - playerChoices.height/2
 }
 
 cardTable.addCardPile(playerLabels)
@@ -226,6 +233,7 @@ cardTable.addCardPile(secondRow);
 cardTable.addCardPile(playerList);
 cardTable.addCardPile(trash)
 cardTable.addCardPile(historyPile)
+cardTable.addCardPile(temp)
 
 // Begin main loop
 cardTable.beginLoop();
@@ -369,6 +377,25 @@ function populatePage(data) {
                 var card = new BorderedPictureCard(getImage(c))
                 cardInfo[c.id] = {object: card, alive: true, location: hand}
                 hand.addCard(card)
+            }
+            let id = c.id
+            card.border_active = false
+            card.onClick = function(){sayMessage('choice', {choice: id, choiceType: "card"})}
+            if(!data.choices.cards || !data.choices.cards.includes(c.id)) card.grayed_out = true
+            else card.grayed_out = false
+        }
+
+        for(var c of data.player.temp){
+            if(cardInfo[c.id]){
+                cardInfo[c.id].object.img.src = getImage(c)
+                temp.stealCard(cardInfo[c.id].object)
+                cardInfo[c.id].alive = true
+                cardInfo[c.id].location = temp
+                card = cardInfo[c.id].object
+            } else {
+                var card = new BorderedPictureCard(getImage(c))
+                cardInfo[c.id] = {object: card, alive: true, location: temp}
+                temp.addCard(card)
             }
             let id = c.id
             card.border_active = false
