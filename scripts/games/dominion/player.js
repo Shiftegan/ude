@@ -199,7 +199,8 @@ class Player{
 
 
 	gainCard(card){
-		this.discard.push(card)
+		if(card) this.discard.push(card)
+
 	}
 
 	hasAction(){

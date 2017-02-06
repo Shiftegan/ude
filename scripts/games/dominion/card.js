@@ -387,7 +387,7 @@ addAction({name: "Sentry", cost: 5, actions: 1, cards: 1, image: "/base/sentry.j
             var choices = ["Leave", "Discard", "Trash"]
             if(choice == "Leave"){
                 var choices = ["Leave", "Under", "Discard", "Trash"]
-                player.deck.unshift(first)
+                player.deck.push(first)
             } else if (choice == "Discard"){
                 player.discard.push(first)
             } else {
@@ -403,8 +403,8 @@ addAction({name: "Sentry", cost: 5, actions: 1, cards: 1, image: "/base/sentry.j
                     player.discard.push(second)
                 } else if (choice == "Under"){
                     var top = player.peel(1)[0]
-                    player.deck.unshift(second)
-                    player.deck.unshift(top)
+                    player.deck.push(second)
+                    player.deck.push(top)
                 } else {
                     game.trash.push(second)
                 }

@@ -338,11 +338,17 @@ class Game {
 	}
 
 	buyCard(name) {
-		var card = this.purchase[name].card
-		this.purchase[name].amount -= 1
-		this.purchase[name].card = new Card(this.lastCardID, cards[name])
-		return card
 		this.stamp++
+		if(this.purchase[name].amount > 0){
+			var card = this.purchase[name].card
+			this.purchase[name].amount -= 1
+			this.purchase[name].card = new Card(this.lastCardID, cards[name])
+			return card
+
+		} else {
+			return false
+		}
+
 	}
 }
 
