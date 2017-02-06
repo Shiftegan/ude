@@ -81,7 +81,7 @@ class Player{
 		this.discard.empty()
 		this.revealed.empty()
 		this.temp.empty()
-        for(var i = 0; i < 7; i++) this.deck.push(this.game.buyCard("Gold"))
+        for(var i = 0; i < 7; i++) this.deck.push(this.game.buyCard("Copper"))
         for(var i = 0; i < 3; i++) this.deck.push(this.game.buyCard("Estate"))
 		this.deck.shuffle()
 		this.order = {next: undefined, prev: undefined}
