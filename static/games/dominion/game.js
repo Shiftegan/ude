@@ -32,6 +32,10 @@ function sayMessage(type, data){
     socket.emit("sayMessage", data)
 }
 
+function redirect(address){
+    window.location.href = "." + address
+}
+
 var cardTable = new CardTable()
 
 
@@ -503,6 +507,11 @@ socket.on('askName', function(data) {
         name: username
     });
 });
+
+socket.on('redirect', function(data) {
+    redirect(data.address)
+})
+
 
 setInterval(function () {
     socket.emit('askUpdate', {roomID: roomID});

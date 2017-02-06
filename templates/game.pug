@@ -1,8 +1,11 @@
 doctype html
 
-- var roomID = room.id
+
 
 html(lang="en")
+
+    - if(!room) var roomID = undefined
+    - else var roomID = room.id
     p(hidden="true", id="roomID")= roomID
     head
         title Game
@@ -17,5 +20,7 @@ html(lang="en")
     script(src="/socket.io/socket.io.js")
     script(src="/static/cards.js")
     script(src="/static/utility.js")
-    script(src="/static/games/" + room.type + "/game.js")
-
+    if roomID != undefined
+        script(src="/static/games/" + room.type + "/game.js")
+    else
+        script(src="/static/invalidGame.js")

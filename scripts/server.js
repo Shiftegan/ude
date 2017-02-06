@@ -121,9 +121,11 @@ function Host() {
 			}
 			return ["sayUpdate", {roomData: roomData}]
 		} else {
-            if(this.rooms.has(data.roomID)){
+            if(this.rooms.has(data.roomID) && this.rooms.get(data.roomID).players.has(user.id)){
                 return ["sayUpdate", this.rooms.get(data.roomID).getUpdate(user, data)]
-            }
+            } else {
+				return ["redirect", {address: "/lobby"}]
+			}
 		}
 	}
 }
