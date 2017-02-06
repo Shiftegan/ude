@@ -227,18 +227,38 @@ class Game {
 	populatePurchase(){
 	    for(var c of BASE_SET.concat(ACTION_SET)){
 	        if(cards[c].types[0] == "treasure"){
-	            this.purchase[c] = {
-	                amount: 100,
-	                card: new Card(this.lastCardID, cards[c])
-	            }
+				if(c == "Copper"){
+					this.purchase[c] = {
+		                amount: 100 + 7 * this.players.size,
+		                card: new Card(this.lastCardID, cards[c])
+		            }
+				} else {
+					this.purchase[c] = {
+		                amount: 100,
+		                card: new Card(this.lastCardID, cards[c])
+		            }
+				}
 	        } else if (cards[c].types[0] == "victory"){
 	            if(c == "Curse"){
 	                this.purchase[c] = {
 	                    amount: 10 * (this.players.size - 1),
 	                    card: new Card(this.lastCardID, cards[c])
 	                }
-	            } else {
-	                if(this.players.length == 2){
+	            } else if(c == "Estate"){
+					if(this.players.size == 2){
+						this.purchase[c] = {
+		                    amount: 8 + 3 * this.players.size,
+		                    card: new Card(this.lastCardID, cards[c])
+		                }
+					} else {
+						this.purchase[c] = {
+		                    amount: 12 + 3 * this.players.size,
+		                    card: new Card(this.lastCardID, cards[c])
+		                }
+					}
+
+				}else {
+	                if(this.players.size == 2){
 	                    this.purchase[c] = {
 	                    	amount: 8,
 	                    	card: new Card(this.lastCardID, cards[c])
