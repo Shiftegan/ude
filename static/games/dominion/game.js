@@ -471,7 +471,7 @@ function populatePage(data) {
             if(!data.choices.cards || !data.choices.cards.includes(c.id)) card.grayed_out = true
             card.onClick = function(){sayMessage('choice', {choice: id, choiceType: "card"})}
 
-            if(c.types.includes("treasure") || c.types.includes("victory")) {
+            if(c.types.includes("treasure") || c.types.includes("victory") || c.types.includes("curse")) {
                 firstRow.addCard(card)
                 cardInfo[c.id] = {object: card, alive: true, location: firstRow}
             }

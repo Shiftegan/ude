@@ -133,7 +133,7 @@ addTreasure({name:"Gold", 	value:3, cost:6, image: "/common/gold.jpg"})
 addVictory({name: "Estate", 	points:1, cost:2, image: "/common/estate.jpg"})
 addVictory({name: "Duchy", 		points:3, cost:5, image: "/common/duchy.jpg"})
 addVictory({name: "Province", 	points:6, cost:8, image: "/common/province.jpg"})
-addVictory({name: "Curse", 		points:-1, cost:0, image: "/common/curse.jpg"})
+addCard({name: "Curse", types: ["curse"], points:-1, cost:0, image: "/common/curse.jpg"})
 
 addVictory({name: "Gardens", getPoints: function(player){return Math.floor(player.deck.length/10)}, cost:4, image: "/base/gardens.jpg"})
 
